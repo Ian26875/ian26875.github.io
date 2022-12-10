@@ -1,7 +1,8 @@
 ---
-title: Hello World
+title: 用Hexo架設Blog
 ---
-Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
+現在在工作上寫文章，都已經是使用了Markdown
+也想用Markdown寫部落格記錄一些工作上面的心得或是紀錄
 
 ## Quick Start
 
