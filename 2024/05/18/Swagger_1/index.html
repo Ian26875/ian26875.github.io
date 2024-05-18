@@ -1,1 +1,201 @@
-<!doctype html><html lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1"><meta http-equiv=X-UA-Compatible content="ie=edge"><link rel="shortcut icon" href=/static/favicon.ico><title>Ian&#39;s Blog</title><link href=/static/css/app.c64eadfc8d3abfc9d85514dba4054813.css rel=stylesheet><meta name="generator" content="Hexo 6.3.0"></head><body><div id=app></div><script type=text/javascript src=/static/js/manifest.992b63bf2abbf3194771.js></script><script type=text/javascript src=/static/js/vendor.e12dc8c9af1f7aa12436.js></script><script type=text/javascript src=/static/js/app.bc036f9167871d39aecf.js></script></body></html>
+<!DOCTYPE html><html lang="zh-tw" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Swagger 文件安裝與設定 | Ian's Blog</title><meta name="author" content="Ian Chen,fds26875@hotmail.com.tw"><meta name="copyright" content="Ian Chen"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Swagger 文件安裝與設定tags: NuGet Package現今許多 Web API 開發團隊都採用 Swagger 來製作 API 文件，這讓開發人員能夠更加便利地開發和測試 API。使用 Swagger 的好處包括但不限於：清楚的 API 規範、易於閱讀的 API 文件、快速的 API 測試等。此外，Swagger 還支援自動生成客戶端程式碼，使得開發人員能夠更快地建立與 API 互動">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swagger 文件安裝與設定">
+<meta property="og:url" content="https://ian26875.github.io/2024/05/18/Swagger_1/index.html">
+<meta property="og:site_name" content="Ian&#39;s Blog">
+<meta property="og:description" content="Swagger 文件安裝與設定tags: NuGet Package現今許多 Web API 開發團隊都採用 Swagger 來製作 API 文件，這讓開發人員能夠更加便利地開發和測試 API。使用 Swagger 的好處包括但不限於：清楚的 API 規範、易於閱讀的 API 文件、快速的 API 測試等。此外，Swagger 還支援自動生成客戶端程式碼，使得開發人員能夠更快地建立與 API 互動">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ian26875.github.io/img/person.jpg">
+<meta property="article:published_time" content="2024-05-18T01:00:48.000Z">
+<meta property="article:modified_time" content="2024-05-18T10:29:09.706Z">
+<meta property="article:author" content="Ian Chen">
+<meta property="article:tag" content=".Net Core">
+<meta property="article:tag" content="2024">
+<meta property="article:tag" content="OpenAPI">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ian26875.github.io/img/person.jpg"><link rel="shortcut icon" href="/img/images.jpg"><link rel="canonical" href="https://ian26875.github.io/2024/05/18/Swagger_1/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Error',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Swagger 文件安裝與設定',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2024-05-18 18:29:09'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/person.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 標籤</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/images.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ian's Blog"><span class="site-name">Ian's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 標籤</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Swagger 文件安裝與設定</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2024-05-18T01:00:48.000Z" title="Created 2024-05-18 09:00:48">2024-05-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-05-18T10:29:09.706Z" title="Updated 2024-05-18 18:29:09">2024-05-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WebAPI/">WebAPI</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WebAPI/OpenAPI/">OpenAPI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Swagger 文件安裝與設定"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Swagger-文件安裝與設定"><a href="#Swagger-文件安裝與設定" class="headerlink" title="Swagger 文件安裝與設定"></a>Swagger 文件安裝與設定</h1><h6 id="tags-NuGet-Package"><a href="#tags-NuGet-Package" class="headerlink" title="tags: NuGet Package"></a>tags: <code>NuGet Package</code></h6><p>現今許多 Web API 開發團隊都採用 Swagger 來製作 API 文件，這讓開發人員能夠更加便利地開發和測試 API。使用 Swagger 的好處包括但不限於：清楚的 API 規範、易於閱讀的 API 文件、快速的 API 測試等。此外，Swagger 還支援自動生成客戶端程式碼，使得開發人員能夠更快地建立與 API 互動的應用程式。</p>
+<span id="more"></span>
+
+<h2 id="Swashbuckle-AspNetCore"><a href="#Swashbuckle-AspNetCore" class="headerlink" title="Swashbuckle.AspNetCore"></a>Swashbuckle.AspNetCore</h2><h3 id="安裝方式"><a href="#安裝方式" class="headerlink" title="安裝方式"></a>安裝方式</h3><p>Nuget Package:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Install-Package Swashbuckle.AspNetCore</span><br></pre></td></tr></table></figure>
+
+<h3 id="註冊服務"><a href="#註冊服務" class="headerlink" title="註冊服務"></a>註冊服務</h3><p><code>Program.cs</code> 中 Dependency Injection 加上以下的程式碼:</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">builder.Services.AddSwaggerGen(options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        options.SwaggerDoc</span><br><span class="line">        (</span><br><span class="line">            <span class="string">&quot;v1&quot;</span>,</span><br><span class="line">            <span class="keyword">new</span> OpenApiInfo()</span><br><span class="line">            &#123;</span><br><span class="line">                Title = <span class="string">&quot; Product Open API&quot;</span>,</span><br><span class="line">                Version = <span class="keyword">new</span> Version(<span class="number">1</span>, <span class="number">0</span>).ToString(),</span><br><span class="line">                Description = <span class="string">&quot;This is Product API Swagger Document.&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        );</span><br><span class="line">      </span><br><span class="line">        <span class="keyword">var</span> xmlFilename = <span class="string">$&quot;<span class="subst">&#123;Assembly.GetExecutingAssembly().GetName().Name&#125;</span>.xml&quot;</span>;</span><br><span class="line">        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+
+<p>在Program.cs之中的Middleware加上</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">app.UseSwagger();</span><br><span class="line">app.UseSwaggerUI();</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><h4 id="MIME-Types"><a href="#MIME-Types" class="headerlink" title="MIME Types"></a>MIME Types</h4><p>MIME (Multipurpose Internet Mail Extensions) 類型是一種標準的 Internet 媒體類型，它用於標識在互聯網上傳輸的各種文件格式。以下是一些常見的 MIME 類型：</p>
+<ul>
+<li>text&#x2F;plain：純文字格式</li>
+<li>text&#x2F;html：HTML 網頁格式</li>
+<li>application&#x2F;json：JSON 格式</li>
+<li>application&#x2F;xml：XML 格式</li>
+<li>multipart&#x2F;form-data：用於表單提交的數據格式</li>
+</ul>
+<p>Controller之中加上 <code>ConsumesAttribute.cs</code> 及 <code>ProducesAttribute.cs</code>，可以在Request及Response 指定 MIME Type。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[<span class="meta">ApiController</span>]</span><br><span class="line">[<span class="meta">Route(<span class="string">&quot;api/[controller]&quot;</span>)</span>]</span><br><span class="line">[<span class="meta">Consumes(MediaTypeNames.Application.Json)</span>]</span><br><span class="line">[<span class="meta">Produces(MediaTypeNames.Application.Json)</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">WeatherForecastController</span> : <span class="title">ControllerBase</span></span><br><span class="line">&#123;</span><br><span class="line">   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="Produces-Response-Type"><a href="#Produces-Response-Type" class="headerlink" title="Produces Response Type"></a>Produces Response Type</h4><p>[ProducesResponseType] 可用於指定 API 方法的輸出類型和狀態碼。在這個例子中，[ProducesResponseType] 屬性指定了三種不同的輸出類型和狀態碼：</p>
+<ul>
+<li><p>如果 API 方法返回的是 ResultOutputModel 類型，且狀態碼為 200 OK，那麼 Swagger 將顯示 ResultOutputModel 類型的數據結構，以及 200 OK 狀態碼的相關信息。</p>
+</li>
+<li><p>如果 API 方法返回的是 FailureResultOutputModel 類型，且狀態碼為 400 Bad Request，那麼 Swagger 將顯示 FailureResultOutputModel 類型的數據結構，以及 400 Bad Request 狀態碼的相關信息。</p>
+</li>
+<li><p>如果 API 方法返回的是 FailureResultOutputModel 類型，且狀態碼為 404 Not Found，那麼 Swagger 將顯示 FailureResultOutputModel 類型的數據結構，以及 404 Not Found 狀態碼的相關信息</p>
+</li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[<span class="meta">HttpPost</span>]    </span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(ResultOutputModel), 200)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(FailureResultOutputModel), 400)</span>]</span><br><span class="line">[<span class="meta">ProducesResponseType(typeof(FailureResultOutputModel), 404)</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">async</span> Task&lt;IActionResult&gt; <span class="title">CreateAsync</span>(<span class="params">[FromBody]CreateCustomerRequest createCustomerRequest</span>)</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="Header加上參數"><a href="#Header加上參數" class="headerlink" title="Header加上參數"></a>Header加上參數</h3><p>當API需要一些Header進行授權等行為時候。Swagger需要做一些調整。舉例來說當Request需要在Header之中的Token進行驗證的時候可以這樣做。</p>
+<p>建立 <code>AddHeaderParameterOperationFilter.cs</code></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AddHeaderParameterOperationFilter</span> : <span class="title">IOperationFilter</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Apply</span>(<span class="params">OpenApiOperation operation, OperationFilterContext context</span>)</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (operation.Parameters == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                operation.Parameters = <span class="keyword">new</span> List&lt;OpenApiParameter&gt;();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            operation.Parameters.Add(<span class="keyword">new</span> OpenApiParameter</span><br><span class="line">            &#123;</span><br><span class="line">                Name = <span class="string">&quot;Token&quot;</span>,</span><br><span class="line">                In = ParameterLocation.Header,</span><br><span class="line">                Required = <span class="literal">true</span>,</span><br><span class="line">                Example = <span class="keyword">new</span> OpenApiString(<span class="string">&quot;&quot;</span>)</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>之後在Progarm.cs的DI註冊加上</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">builder.Services.AddSwaggerGen(options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">                            </span><br><span class="line">        options.SwaggerDoc</span><br><span class="line">        (</span><br><span class="line">            <span class="string">&quot;v1&quot;</span>,</span><br><span class="line">            <span class="keyword">new</span>()</span><br><span class="line">            &#123;</span><br><span class="line">                Title = <span class="string">&quot; Product Open API&quot;</span>,</span><br><span class="line">                Version = <span class="keyword">new</span> Version(<span class="number">1</span>, <span class="number">0</span>).ToString(),</span><br><span class="line">                Description = <span class="string">&quot;This is Product API Swagger Document.&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        );</span><br><span class="line">      </span><br><span class="line">        <span class="keyword">var</span> xmlFilename = <span class="string">$&quot;<span class="subst">&#123;Assembly.GetExecutingAssembly().GetName().Name&#125;</span>.xml&quot;</span>;</span><br><span class="line">        options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 加上這一行</span></span><br><span class="line">        options.OperationFilter&lt;AddHeaderParameterOperationFilter&gt;();</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://ian26875.github.io">Ian Chen</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://ian26875.github.io/2024/05/18/Swagger_1/">https://ian26875.github.io/2024/05/18/Swagger_1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Net-Core/">.Net Core</a><a class="post-meta__tags" href="/tags/2024/">2024</a><a class="post-meta__tags" href="/tags/OpenAPI/">OpenAPI</a></div><div class="post_share"><div class="social-share" data-image="/img/person.jpg" data-sites="facebook,twitter"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/05/18/Swagger_2/" title="Swagger 文件加上範例格式資料"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Previous</div><div class="prev_info">Swagger 文件加上範例格式資料</div></div></a></div><div class="next-post pull-right"><a href="/2024/03/19/DDD/" title="Domain Driven Design"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next</div><div class="next_info">Domain Driven Design</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2024/05/18/Swagger_2/" title="Swagger 文件加上範例格式資料"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-18</div><div class="title">Swagger 文件加上範例格式資料</div></div></a></div><div><a href="/2024/05/18/Swagger_3/" title="Swagger 文件加上FluentValidation驗證規則"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-18</div><div class="title">Swagger 文件加上FluentValidation驗證規則</div></div></a></div><div><a href="/2024/02/16/LoggingMessage/" title="更高效 Logging - LoggerMessage"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-02-16</div><div class="title">更高效 Logging - LoggerMessage</div></div></a></div><div><a href="/2023/04/16/AspNetCore_WebAPI/" title="Asp.Net Core API Controller繼承"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-04-16</div><div class="title">Asp.Net Core API Controller繼承</div></div></a></div><div><a href="/2023/11/27/DependencyInjection1/" title="Dependency Injection (一) 簡介"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-27</div><div class="title">Dependency Injection (一) 簡介</div></div></a></div><div><a href="/2023/11/27/HttpClient/" title="關於 HttpClient 使用方式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-11-27</div><div class="title">關於 HttpClient 使用方式</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/person.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Ian Chen</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">12</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ian26875"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/ian26875" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:fds26875@hotmail.com.tw" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Swagger-%E6%96%87%E4%BB%B6%E5%AE%89%E8%A3%9D%E8%88%87%E8%A8%AD%E5%AE%9A"><span class="toc-number">1.</span> <span class="toc-text">Swagger 文件安裝與設定</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#tags-NuGet-Package"><span class="toc-number">1.0.0.0.0.1.</span> <span class="toc-text">tags: NuGet Package</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Swashbuckle-AspNetCore"><span class="toc-number">1.1.</span> <span class="toc-text">Swashbuckle.AspNetCore</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%9D%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.1.</span> <span class="toc-text">安裝方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%BB%E5%86%8A%E6%9C%8D%E5%8B%99"><span class="toc-number">1.1.2.</span> <span class="toc-text">註冊服務</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.3.</span> <span class="toc-text">使用方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#MIME-Types"><span class="toc-number">1.1.3.1.</span> <span class="toc-text">MIME Types</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Produces-Response-Type"><span class="toc-number">1.1.3.2.</span> <span class="toc-text">Produces Response Type</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Header%E5%8A%A0%E4%B8%8A%E5%8F%83%E6%95%B8"><span class="toc-number">1.1.4.</span> <span class="toc-text">Header加上參數</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/05/18/Swagger_3/" title="Swagger 文件加上FluentValidation驗證規則">Swagger 文件加上FluentValidation驗證規則</a><time datetime="2024-05-18T01:15:48.000Z" title="Created 2024-05-18 09:15:48">2024-05-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/05/18/Swagger_2/" title="Swagger 文件加上範例格式資料">Swagger 文件加上範例格式資料</a><time datetime="2024-05-18T01:10:48.000Z" title="Created 2024-05-18 09:10:48">2024-05-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/05/18/Swagger_1/" title="Swagger 文件安裝與設定">Swagger 文件安裝與設定</a><time datetime="2024-05-18T01:00:48.000Z" title="Created 2024-05-18 09:00:48">2024-05-18</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/03/19/DDD/" title="Domain Driven Design">Domain Driven Design</a><time datetime="2024-03-19T10:23:48.000Z" title="Created 2024-03-19 18:23:48">2024-03-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/03/19/DIP/" title="SOLID原則:依賴反轉原則(Dependency Inversion Principle)">SOLID原則:依賴反轉原則(Dependency Inversion Principle)</a><time datetime="2024-03-19T09:41:48.000Z" title="Created 2024-03-19 17:41:48">2024-03-19</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2024 By Ian Chen</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
