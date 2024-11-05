@@ -1,0 +1,301 @@
+<!DOCTYPE html><html lang="zh-tw" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience | Ian's Blog</title><meta name="author" content="Ian Chen,fds26875@hotmail.com.tw"><meta name="copyright" content="Ian Chen"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience在開發WebAPI串接第三方服務或是其他服務，通常會在HttpClient連線部分進行設定 Polly，以前會使用 Microsoft.Extensions.Http.Polly套件，但是最近翻文件發現 Polly 更新版本提供了 Pipeline 使用方式。使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience">
+<meta property="og:url" content="https://ian26875.github.io/2024/11/05/Polly_CircuitBreaker/index.html">
+<meta property="og:site_name" content="Ian&#39;s Blog">
+<meta property="og:description" content="HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience在開發WebAPI串接第三方服務或是其他服務，通常會在HttpClient連線部分進行設定 Polly，以前會使用 Microsoft.Extensions.Http.Polly套件，但是最近翻文件發現 Polly 更新版本提供了 Pipeline 使用方式。使用">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://ian26875.github.io/image/person.jpg">
+<meta property="article:published_time" content="2024-11-05T13:00:48.000Z">
+<meta property="article:modified_time" content="2024-11-05T15:02:38.271Z">
+<meta property="article:author" content="Ian Chen">
+<meta property="article:tag" content="Polly">
+<meta property="article:tag" content="HttpClient">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ian26875.github.io/image/person.jpg"><link rel="shortcut icon" href="/image/icon.png"><link rel="canonical" href="https://ian26875.github.io/2024/11/05/Polly_CircuitBreaker/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy Successful',
+    error: 'Copy Error',
+    noSupport: 'Browser Not Supported'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'Just now',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'mediumZoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: 'Load More'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-11-05 23:02:38'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">Loading...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+  window.addEventListener('load',() => { preloader.endLoading() })
+
+  if (false) {
+    document.addEventListener('pjax:send', () => { preloader.initLoading() })
+    document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/image/person.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">25</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">18</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 標籤</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/image/images.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ian's Blog"><span class="site-name">Ian's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首頁</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 時間軸</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 標籤</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分類</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 關於</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2024-11-05T13:00:48.000Z" title="Created 2024-11-05 21:00:48">2024-11-05</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2024-11-05T15:02:38.271Z" title="Updated 2024-11-05 23:02:38">2024-11-05</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/WebAPI/">WebAPI</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post Views:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="HttpClient-與-Polly-進行重試與斷路策略-Microsoft-Extensions-Http-Resilience"><a href="#HttpClient-與-Polly-進行重試與斷路策略-Microsoft-Extensions-Http-Resilience" class="headerlink" title="HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience"></a>HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience</h1><p>在開發WebAPI串接第三方服務或是其他服務，通常會在HttpClient連線部分進行設定 Polly，以前會使用 <code>Microsoft.Extensions.Http.Polly</code>套件，但是最近翻文件發現 Polly 更新版本提供了 Pipeline 使用方式。<br>使用 HttpClientFactory 微軟官方也有新增 <code>Microsoft.Extensions.Http.Resilience</code> 來支援這方式。比起 Policy 方式宣告 Pipeline 在效能上更優化。而且提供斷路器可以進行監控狀態及手動控制等功能，讓斷路器實作上更方便。下面範例使用 .Net 8 進行示範。</p>
+<p>Polly 官方文件</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.pollydocs.org/advanced/performance.html">https://www.pollydocs.org/advanced/performance.html</a></p>
+</blockquote>
+<p>微軟官方文件</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/dotnet/core/resilience/?tabs=dotnet-cli">https://learn.microsoft.com/en-us/dotnet/core/resilience/?tabs=dotnet-cli</a></p>
+</blockquote>
+<h2 id="安裝方式"><a href="#安裝方式" class="headerlink" title="安裝方式"></a>安裝方式</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet add package Microsoft.Extensions.Http.Resilience</span><br></pre></td></tr></table></figure>
+
+<h2 id="Circuit-Breaker-斷路器實作與設定"><a href="#Circuit-Breaker-斷路器實作與設定" class="headerlink" title="Circuit Breaker 斷路器實作與設定"></a>Circuit Breaker 斷路器實作與設定</h2><p>比起之前版本新版提供 <code>CircuitBreakerStateProvider</code>、<code>CircuitBreakerManualControl</code>類別。但是需要依照各斷路器設定不同的狀態提供者及控制器。</p>
+<h3 id="CircuitBreakerManualControl-cs-介紹"><a href="#CircuitBreakerManualControl-cs-介紹" class="headerlink" title="CircuitBreakerManualControl.cs 介紹"></a>CircuitBreakerManualControl.cs 介紹</h3><p>提供兩個方法 <code>CloseAsync</code>、<code>IsolateAsync</code>進行手動控制斷路器。</p>
+<ul>
+<li><p>IsolateAsync(隔離)<br>IsolateAsync 方法將斷路器手動設置為 Isolated 狀態。當呼叫此方法後，斷路器將進入隔離狀態，阻止所有請求的執行，無論系統是否正常。此狀態會保持，直到手動解除隔離。</p>
+</li>
+<li><p>CloseAsync(關閉)<br>CloseAsync 方法將斷路器手動恢復到 Closed 狀態，允許所有請求正常通過。</p>
+</li>
+</ul>
+<h3 id="CircuitBreakerStateProvider-cs-介紹"><a href="#CircuitBreakerStateProvider-cs-介紹" class="headerlink" title="CircuitBreakerStateProvider.cs 介紹"></a>CircuitBreakerStateProvider.cs 介紹</h3><p><code>CircuitBreakerStateProvider.cs</code> 有提供目前狀態 <strong>CircuitState</strong> ，並裡面有四種狀態以下是這四種狀態介紹。</p>
+<ul>
+<li><p>Closed（關閉狀態）：<br>在 Closed 狀態下，斷路器允許執行所有操作。這表示電路正常運作，所有請求都會通過。通常當操作成功率高且錯誤次數未達到設定的閾值時，斷路器會保持在 Closed 狀態。</p>
+</li>
+<li><p>Open（開啟狀態）：<br>Open 狀態通常由控制器觸發，表示斷路器已被打開。這是因為請求失敗次數超過了設定閥值。在 Open 狀態下，所有操作的執行會被阻止，並拋出<strong>BrokenCircuitException</strong>。</p>
+</li>
+<li><p>Half-open（半開狀態）：<br>Half-open 狀態表示斷路器正在從 Open 狀態恢復。當斷路器經過設定的 <strong>BreakDuration</strong> 時間後進入此狀態，表示正在嘗試恢復正常的請求處理。在此狀態下，斷路器會允許部分請求通過並監控其結果。如果這些請求成功，斷路器改到 Closed 狀態；如果請求再次失敗，斷路器回到 Open 狀態。</p>
+</li>
+<li><p>Isolated（隔離狀態）：<br>Isolated 狀態表示斷路器被手動隔離進入 Open 狀態。這是透過呼叫 <code>CircuitBreakerManualControl.IsolateAsync</code> 方法。在此狀態下，所有操作的執行會被阻止，並拋出 <strong>IsolatedCircuitException</strong> ，直到手動呼叫<code>CircuitBreakerManualControl.CloseAsync</code>方法將斷路器改為 Closed 狀態。</p>
+</li>
+</ul>
+<h3 id="設定"><a href="#設定" class="headerlink" title="設定"></a>設定</h3><p>這邊在設定上說明一下每欄位</p>
+<p>Polly 官方文件</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.pollydocs.org/strategies/circuit-breaker.html">https://www.pollydocs.org/strategies/circuit-breaker.html</a></p>
+</blockquote>
+<ul>
+<li><p><code>FailureRatio</code> 為失敗率必須是0~1。如果是0.1的話，表示發送請求中達到10%的失敗就進行斷路。</p>
+</li>
+<li><p><code>SamplingDuration</code> 計算失敗-成功比率的時間段。</p>
+</li>
+<li><p><code>MinimumThroughput</code> 在指定的採樣持續時間內必須發生的最小執行次數。</p>
+</li>
+<li><p><code>BreakDuration</code> 斷路時間長度，等到時間結束並不會馬上恢復，而是進行少量的請求。確定了服務正常才進行打開。</p>
+</li>
+<li><p><code>StateProvider</code> 如果提供，則可以透過物件檢索電路的當前狀態。</p>
+</li>
+<li><p><code>ManualControl</code> 如果提供，則可以透過物件手動控制電路的狀態。</p>
+</li>
+</ul>
+<ul>
+<li><code>Program.cs</code></li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">builder.Services.AddKeyedSingleton&lt;CircuitBreakerStateProvider&gt;(<span class="string">&quot;CircuitBreakerSamplePipeline&quot;</span>);</span><br><span class="line">builder.Services.AddKeyedSingleton&lt;CircuitBreakerManualControl&gt;(<span class="string">&quot;CircuitBreakerSamplePipeline&quot;</span>);</span><br><span class="line"></span><br><span class="line">builder.Services.AddHttpClient(<span class="string">&quot;CircuitBreakerSample&quot;</span>)</span><br><span class="line">    .AddResilienceHandler</span><br><span class="line">    (</span><br><span class="line">        <span class="string">&quot;CircuitBreakerSamplePipeline&quot;</span>,</span><br><span class="line">        (pipelineBuilder,context)=&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// CircuitBreaker</span></span><br><span class="line">            <span class="keyword">var</span> loggerFactory = context.ServiceProvider.GetRequiredService&lt;ILoggerFactory&gt;();</span><br><span class="line">            <span class="keyword">var</span> logger = loggerFactory.CreateLogger(<span class="string">&quot;SamplePipeline-CircuitBreaker&quot;</span>);</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">var</span> stateProvider = context.ServiceProvider.GetRequiredKeyedService&lt;CircuitBreakerStateProvider&gt;(CircuitBreakerPipelineNames.Sample);</span><br><span class="line">            <span class="keyword">var</span> manualControl = context.ServiceProvider.GetRequiredKeyedService&lt;CircuitBreakerManualControl&gt;(CircuitBreakerPipelineNames.Sample);</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">var</span> circuitBreakerStrategyOptions = <span class="keyword">new</span> CircuitBreakerStrategyOptions&lt;HttpResponseMessage&gt;</span><br><span class="line">            &#123;</span><br><span class="line">                FailureRatio = <span class="number">0.01</span>,</span><br><span class="line">                SamplingDuration = TimeSpan.FromMinutes(<span class="number">1</span>),</span><br><span class="line">                MinimumThroughput = <span class="number">2</span>,</span><br><span class="line">                BreakDuration = TimeSpan.FromSeconds(<span class="number">30</span>),</span><br><span class="line">                ShouldHandle = <span class="keyword">new</span> PredicateBuilder&lt;HttpResponseMessage&gt;()</span><br><span class="line">                    .HandleResult</span><br><span class="line">                    (</span><br><span class="line">                        response =&gt; response.StatusCode <span class="keyword">is</span> HttpStatusCode.OK</span><br><span class="line">                    ),</span><br><span class="line">                StateProvider = stateProvider,</span><br><span class="line">                ManualControl = manualControl,</span><br><span class="line">                OnOpened = arg =&gt;</span><br><span class="line">                &#123;</span><br><span class="line">                    logger.LogInformation(<span class="string">&quot;Circuit opened for &#123;Duration&#125; seconds due to: &#123;StatusCode&#125;&quot;</span>, arg.BreakDuration.TotalSeconds, arg.Outcome.Result?.StatusCode);</span><br><span class="line">                    <span class="keyword">return</span> ValueTask.CompletedTask;</span><br><span class="line">                &#125;,</span><br><span class="line">                OnClosed = arg =&gt;</span><br><span class="line">                &#123;</span><br><span class="line">                    logger.LogInformation(<span class="string">&quot;Circuit closed. Resuming normal operation.&quot;</span>);</span><br><span class="line">                    <span class="keyword">return</span> ValueTask.CompletedTask;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            pipelineBuilder.AddCircuitBreaker(circuitBreakerStrategyOptions);                        </span><br><span class="line">        &#125;</span><br><span class="line">    );</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>只需要與之前使用HttpClientFactory方式一樣即可</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">[<span class="meta">HttpGet</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">async</span> Task&lt;IActionResult&gt; <span class="title">CircuitBreaker</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> httpClient = _httpClientFactory.CreateClient(<span class="string">&quot;CircuitBreakerSample&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> response = <span class="keyword">await</span> httpClient.GetAsync(<span class="string">&quot;https://ian26875.github.io/&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Content(response.StatusCode.ToString());</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h2 id="演示範例"><a href="#演示範例" class="headerlink" title="演示範例"></a>演示範例</h2><p>這邊也提供範例程式碼，為了測試方便範例程式碼只需要1分鐘內執行兩次回應為Ok(ShouldHandle 設定為 response.StatusCode 200 )以上就會觸發斷路器的 Closed，做一個簡單畫面進行觀察。</p>
+<ul>
+<li>原本正常不啟動斷路</li>
+</ul>
+<p><img src="/image/CircuitBreaker_Demo.png" alt="CircuitBreaker_Demo"></p>
+<ul>
+<li>進行觸發斷路系統會拋出 <code>BrokenCircuitException</code></li>
+</ul>
+<p><img src="/image/CircuitBreaker_CBException.png" alt="CircuitBreaker_Demo"></p>
+<ul>
+<li>查詢斷路狀態為 <strong>Open</strong></li>
+</ul>
+<p><img src="/image/CircuitBreaker_Open.png" alt="CircuitBreaker_Open"></p>
+<ul>
+<li>恢復成手動點擊關閉斷路或是等待<code>BreakDuration</code>時間過去</li>
+</ul>
+<p><img src="/image/CircuitBreaker_Demo.png" alt="CircuitBreaker_Demo"></p>
+<ul>
+<li>手動點擊斷路器，則狀態變更為 Isolated</li>
+</ul>
+<p><img src="/image/CircuitBreaker_Close.png" alt="CircuitBreaker_Close"></p>
+<ul>
+<li>在狀態為 Isolated，發送請求系統會拋出 <code>IsolatedCircuitException</code></li>
+</ul>
+<p><img src="/image/CircuitBreaker_IsolatedCircuitException.png" alt="CircuitBreaker_IsolatedCircuitException"></p>
+<h2 id="範例程式碼"><a href="#範例程式碼" class="headerlink" title="範例程式碼"></a>範例程式碼</h2><p>關於上面的程式碼也提供在個人Github上面有完整的範例程式碼</p>
+<ul>
+<li>範例專案 <a target="_blank" rel="noopener" href="https://github.com/Ian26875/PollySample/tree/main/PollySample/PollySample">PollySample</a></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>Author: </span><span class="post-copyright-info"><a href="https://ian26875.github.io">Ian Chen</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>Link: </span><span class="post-copyright-info"><a href="https://ian26875.github.io/2024/11/05/Polly_CircuitBreaker/">https://ian26875.github.io/2024/11/05/Polly_CircuitBreaker/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Polly/">Polly</a><a class="post-meta__tags" href="/tags/HttpClient/">HttpClient</a></div><div class="post_share"><div class="social-share" data-image="/image/person.jpg" data-sites="facebook,twitter"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2024/09/29/MockServer_%E6%95%B4%E5%90%88%E6%B8%AC%E8%A9%A6/" title="使用 MockServer 與 TestContainer 進行整合測試"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">Next</div><div class="next_info">使用 MockServer 與 TestContainer 進行整合測試</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/image/person.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Ian Chen</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">25</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">17</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">18</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ian26875"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/ian26875" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:fds26875@hotmail.com.tw" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Contents</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#HttpClient-%E8%88%87-Polly-%E9%80%B2%E8%A1%8C%E9%87%8D%E8%A9%A6%E8%88%87%E6%96%B7%E8%B7%AF%E7%AD%96%E7%95%A5-Microsoft-Extensions-Http-Resilience"><span class="toc-number">1.</span> <span class="toc-text">HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%9D%E6%96%B9%E5%BC%8F"><span class="toc-number">1.1.</span> <span class="toc-text">安裝方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Circuit-Breaker-%E6%96%B7%E8%B7%AF%E5%99%A8%E5%AF%A6%E4%BD%9C%E8%88%87%E8%A8%AD%E5%AE%9A"><span class="toc-number">1.2.</span> <span class="toc-text">Circuit Breaker 斷路器實作與設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CircuitBreakerManualControl-cs-%E4%BB%8B%E7%B4%B9"><span class="toc-number">1.2.1.</span> <span class="toc-text">CircuitBreakerManualControl.cs 介紹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CircuitBreakerStateProvider-cs-%E4%BB%8B%E7%B4%B9"><span class="toc-number">1.2.2.</span> <span class="toc-text">CircuitBreakerStateProvider.cs 介紹</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A8%AD%E5%AE%9A"><span class="toc-number">1.2.3.</span> <span class="toc-text">設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="toc-number">1.2.4.</span> <span class="toc-text">使用方式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%94%E7%A4%BA%E7%AF%84%E4%BE%8B"><span class="toc-number">1.3.</span> <span class="toc-text">演示範例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AF%84%E4%BE%8B%E7%A8%8B%E5%BC%8F%E7%A2%BC"><span class="toc-number">1.4.</span> <span class="toc-text">範例程式碼</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/11/05/Polly_CircuitBreaker/" title="HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience">HttpClient 與 Polly 進行重試與斷路策略 - Microsoft.Extensions.Http.Resilience</a><time datetime="2024-11-05T13:00:48.000Z" title="Created 2024-11-05 21:00:48">2024-11-05</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/09/29/MockServer_%E6%95%B4%E5%90%88%E6%B8%AC%E8%A9%A6/" title="使用 MockServer 與 TestContainer 進行整合測試">使用 MockServer 與 TestContainer 進行整合測試</a><time datetime="2024-09-29T07:00:48.000Z" title="Created 2024-09-29 15:00:48">2024-09-29</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/07/24/ImpedanceMismatch_2/" title="資料庫與物件導向的不匹配阻抗 (二) - Object-Relational Mapping 框架">資料庫與物件導向的不匹配阻抗 (二) - Object-Relational Mapping 框架</a><time datetime="2024-07-24T13:14:48.000Z" title="Created 2024-07-24 21:14:48">2024-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/07/24/ImpedanceMismatch_1/" title="資料庫與物件導向的不匹配阻抗 (一) - 什麼是不匹配阻抗?">資料庫與物件導向的不匹配阻抗 (一) - 什麼是不匹配阻抗?</a><time datetime="2024-07-24T04:15:48.000Z" title="Created 2024-07-24 12:15:48">2024-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/06/30/EventStormingIntro/" title="Event Storming 工作坊：打破溝通的橫溝">Event Storming 工作坊：打破溝通的橫溝</a><time datetime="2024-06-30T14:20:48.000Z" title="Created 2024-06-30 22:20:48">2024-06-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2023 - 2024 By Ian Chen</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between Single-column and Double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaid.length === 0) return
+  const runMermaid = () => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    Array.from($mermaid).forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+      const mermaidID = 'mermaid-' + index
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+
+      const renderV10 = () => {
+        renderFn.then(({svg}) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svg)
+        })
+      }
+
+      const renderV9 = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      typeof renderFn === 'string' ? renderV9(renderFn) : renderV10()
+    })
+  }
+
+  const loadMermaid = () => {
+    window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid@10.8.0/dist/mermaid.min.js').then(runMermaid)
+  }
+
+  btf.addGlobalFn('themeChange', runMermaid, 'mermaid')
+
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
